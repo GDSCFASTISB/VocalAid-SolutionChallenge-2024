@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+package="com.gdsc.solution_challenge">
+    
     <application
         android:label="gdscapp"
         android:name="${applicationName}"
