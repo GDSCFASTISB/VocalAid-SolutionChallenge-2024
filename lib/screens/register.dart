@@ -10,7 +10,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  int _counter = 0;
+  final int _counter = 0;
 
   void addUser() {
     DBHandler dbHandler = DBHandler.getDBHandler();
@@ -24,7 +24,7 @@ class _RegisterState extends State<Register> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the Register object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: const Text("Regis"),
+        title: const Text("Register"),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it

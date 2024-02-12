@@ -1,5 +1,4 @@
 import 'package:gdscapp/index.dart';
-import 'package:gdscapp/screens/home_page.dart';
 import 'package:gdscapp/screens/register.dart';
 
 void main() {
@@ -43,7 +42,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xF9C571)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0x00f9c571)),
         scaffoldBackgroundColor: Colors.blueGrey.shade100,
         useMaterial3: true,
       ),
