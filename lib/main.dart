@@ -1,6 +1,7 @@
 import 'package:gdscapp/index.dart';
 import 'package:gdscapp/screens/home_page.dart';
 import 'package:gdscapp/screens/register.dart';
+import 'package:gdscapp/screens/speech_enhancement.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.blueGrey.shade100,
         useMaterial3: true,
       ),
-      home: const Register(),
+      home: const SpeechEnhancement(),
     );
   }
 }
