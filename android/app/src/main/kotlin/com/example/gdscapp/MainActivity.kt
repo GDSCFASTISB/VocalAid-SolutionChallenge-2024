@@ -1,4 +1,4 @@
-package com.example.gdscapp
+package com.gdsc.solution_challenge
 
 import io.flutter.embedding.android.FlutterActivity
 
