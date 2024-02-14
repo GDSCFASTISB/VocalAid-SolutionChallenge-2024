@@ -10,7 +10,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  int _counter = 0;
+  final int _counter = 0;
 
   void addUser() {
     DBHandler dbHandler = DBHandler.getDBHandler();

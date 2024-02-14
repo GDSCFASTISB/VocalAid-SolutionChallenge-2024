@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    
+    namespace "com.gdsc.solution_challenge"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -49,9 +49,9 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
+        multiDexEnabled = true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        
 
     }
 
@@ -68,4 +68,4 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {implementation("androidx.multidex:multidex:2.0.1")}
