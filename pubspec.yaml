@@ -45,6 +45,12 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_fonts: ^6.1.0
   firebase_auth: ^4.17.4
+  flutter_sound: ^9.2.13
+  permission_handler: ^11.2.0
+  path_provider: ^2.1.2
+  record: ^5.0.4
+  audioplayers: ^5.2.1
+  # audio_waveforms: ^1.0.4
 
 dev_dependencies:
   flutter_test:
