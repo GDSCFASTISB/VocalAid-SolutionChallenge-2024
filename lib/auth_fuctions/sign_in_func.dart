@@ -15,6 +15,7 @@ Future<void> signIn(String email, String pass) async {
       CustomProgressDialog.hideProDialog();
 
       if (user != null) {
+        print("signed in");
         switchScreen(wordListScreen);
       } else {
         showToast("user credentials not found");
