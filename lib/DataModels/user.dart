@@ -7,6 +7,7 @@ part 'user.g.dart';
 @JsonSerializable()
 class User {
   String name;
+  String userID;
   String emailAddress;
   String phNO;
   String password;
@@ -23,6 +24,7 @@ class User {
       this.emailAddress = '',
       this.phNO = '',
       this.password = '',
+      this.userID = '',
       this.gender,
       this.dob});
 }

@@ -1,12 +1,11 @@
-import "dart:async";
-import "dart:convert";
-
-import "package:audioplayers/audioplayers.dart";
-import "package:gdscapp/index.dart";
-import "package:record/record.dart";
+import '../index.dart';
 
 class SpeechEnhancement extends StatefulWidget {
-  const SpeechEnhancement({Key? key}) : super(key: key);
+  final Vocals vocal;
+  const SpeechEnhancement({
+    super.key,
+    required this.vocal,
+  });
 
   @override
   _SpeechEnhancementState createState() => _SpeechEnhancementState();
@@ -14,16 +13,17 @@ class SpeechEnhancement extends StatefulWidget {
 
 class _SpeechEnhancementState extends State<SpeechEnhancement> {
   late AudioRecorder _recorder;
-  late AudioPlayer _player;
+  // late AudioPlayer _player;
   bool _recording = false;
   bool _recorderReady = false;
   String audioPath = "";
+  bool _recordingDone = false;
 
   @override
   void initState() {
     super.initState();
     _recorder = AudioRecorder();
-    _player = AudioPlayer();
+    // _player = AudioPlayer();
     _initRecorder();
   }
 
@@ -88,18 +88,20 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
     }
   }
 
-  Future<void> _playRecording() async {
-    if (audioPath == "") {
-      return;
-    }
+  // Future<void> _playRecording() async {
+  //   if (audioPath == "") {
+  //     return;
+  //   }
 
-    try {
-      Source url = UrlSource(audioPath);
-      await _player.play(url);
-    } catch (e) {
-      debugPrint("$e");
-    }
-  }
+  //   try {
+  //     Source url = UrlSource(audioPath);
+  //     await _player.play(url);
+  //   } catch (e) {
+  //     debugPrint("$e");
+  //   }
+  // }
+
+  int points = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -110,48 +112,127 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CustomCard(
+            CustomCard(
               child: Column(
                 children: [
                   Text(
-                    'Honorific',
-                    style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                    widget.vocal.words,
+                    style: const TextStyle(
+                        fontSize: 40, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'o·nuh·ri·fuhk',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    widget.vocal.syllables,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  _recording = !_recording;
-                });
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    setState(() {
+                      _recording = !_recording;
+                      _recordingDone = false;
+                    });
 
-                if (_recording) {
-                  await _record();
-                } else {
-                  await _stopRecording();
-                }
+                    if (_recording) {
+                      await _record();
+                    } else {
+                      await _stopRecording();
+                      _recordingDone = true;
+                    }
 
-                print('Recording: $_recording');
-              },
-              child: Icon(_recording ? Icons.stop : Icons.mic),
+                    print('Recording: $_recording');
+                  },
+                  child: Icon(_recording ? Icons.stop : Icons.mic),
+                ),
+                if (!_recording)
+                  ElevatedButton(
+                    onPressed: () async {},
+                    child: const Icon(Icons.refresh),
+                  ),
+              ],
             ),
-            if (!_recording)
-              ElevatedButton(
-                onPressed: () async {
-                  _playRecording();
-                },
-                child: Icon(Icons.refresh),
+            const Spacer(),
+            Visibility(
+              visible: _recordingDone,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const AnimatedCircularProgressWidget(
+                          accuracy: 70,
+                        ),
+                        Column(
+                          children: [
+                            AnimatedTextKit(
+                              animatedTexts: [
+                                WavyAnimatedText(
+                                  '$points',
+                                  textStyle: GoogleFonts.lato(
+                                    fontSize: 65,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                              isRepeatingAnimation: false,
+                              onTap: () {
+                                print("Tap Event");
+                              },
+                            ),
+                            const CustomText(text: "You scored"),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+
+
+
+
+// final csvFile =
+//                       File('/Users/ryan/Developer/gdscapp/assets/data.csv')
+//                           .readAsStringSync();
+//                   final csvToList = const CsvToListConverter().convert(csvFile);
+//                   DBHandler dbHandler = DBHandler.getDBHandler();
+//                   CustomProgressDialog.showProDialog("uploading files");
+//                   for (final row in csvToList) {
+//                     try {
+//                       File file = File(
+//                           '/Users/ryan/Developer/gdscapp/assets/${row[8]}.wav');
+//                       await orginalRecordingsStorage
+//                           .child("${row[8]}")
+//                           .putData(file.readAsBytesSync());
+
+//                       await dbHandler.db.collection("vocals").doc().set(Vocals(
+//                               words: row[0],
+//                               syllables: row[6],
+//                               audioWaveUrl: row[8])
+//                           .toJson());
+//                     } catch (e) {
+//                       print('error while uploading file $e');
+//                     }
+
+//                     print(row[0]);
+//                     print(row[6]);
+//                     print('/Users/ryan/Developer/gdscapp/assets/${row[8]}.csv');
+//                   }
+//                   CustomProgressDialog.hideProDialog();

@@ -1,16 +1,31 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import "package:gdscapp/index.dart";
 
-Future<void> sign_in(String emailAddress, String password) async {
+Future<void> signIn(String email, String pass) async {
+  DBHandler db = DBHandler.getDBHandler();
+  CustomProgressDialog.showProDialog("Signing in");
   try {
-    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailAddress,
-      password: password,
-    );
-  } on FirebaseAuthException catch (e) {
+    await fBAuth
+        .signInWithEmailAndPassword(
+      email: email,
+      password: pass,
+    )
+        .then((value) async {
+      User? user = await db.getUser(email);
+
+      if (user != null) {
+        CustomProgressDialog.hideProDialog();
+
+        switchScreen(wordListScreen);
+      } else {
+        showToast("user credentials not found");
+      }
+    });
+  } on auth.FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
-      print('No user found for that email.');
+      showToast('No user found for that email.');
     } else if (e.code == 'wrong-password') {
-      print('Wrong password provided for that user.');
+      showToast('Wrong password provided for that user.');
     }
   }
 }

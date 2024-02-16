@@ -11,12 +11,14 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       emailAddress: json['emailAddress'] as String? ?? '',
       phNO: json['phNO'] as String? ?? '',
       password: json['password'] as String? ?? '',
+      userID: json['UserID'] as String? ?? '',
       gender: json['gender'] as bool?,
       dob: const TimeStampSerializer().fromJson(json['dob'] as Timestamp?),
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'name': instance.name,
+      'UserID': instance.userID,
       'emailAddress': instance.emailAddress,
       'phNO': instance.phNO,
       'password': instance.password,

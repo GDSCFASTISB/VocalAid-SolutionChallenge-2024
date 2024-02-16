@@ -55,8 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
                 onPressed: () async {
                   DBHandler db = DBHandler.getDBHandler();
-                  User user = await db.getUser("Salman");
-                  debugPrint(user.name);
+                  // User user = await db.getUser("Salman");
                 },
                 child: const Text("Name")),
             const Text(
