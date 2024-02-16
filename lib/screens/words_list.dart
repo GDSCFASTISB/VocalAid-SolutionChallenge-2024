@@ -61,7 +61,13 @@ class _WordListState extends State<WordList> {
                           margins: 2,
                           paddings: 2,
                           child: ListTile(
-                            title: Text(vocals.words),
+                            title: Text(
+                              vocals.words,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 24),
+                            ),
                             subtitle: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -69,7 +75,8 @@ class _WordListState extends State<WordList> {
                                   vocals.syllables,
                                   style: const TextStyle(
                                       fontStyle: FontStyle.italic,
-                                      fontSize: 12),
+                                      fontSize: 16,
+                                      color: Colors.white),
                                 ),
                                 const Spacer(),
                               ],

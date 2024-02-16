@@ -12,16 +12,17 @@ Future<void> signIn(String email, String pass) async {
     )
         .then((value) async {
       User? user = await db.getUser(email);
+      CustomProgressDialog.hideProDialog();
 
       if (user != null) {
-        CustomProgressDialog.hideProDialog();
-
         switchScreen(wordListScreen);
       } else {
         showToast("user credentials not found");
       }
     });
   } on auth.FirebaseAuthException catch (e) {
+    print(e);
+    CustomProgressDialog.hideProDialog();
     if (e.code == 'user-not-found') {
       showToast('No user found for that email.');
     } else if (e.code == 'wrong-password') {

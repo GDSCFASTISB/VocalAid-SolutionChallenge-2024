@@ -119,12 +119,16 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                   Text(
                     widget.vocal.words,
                     style: const TextStyle(
-                        fontSize: 40, fontWeight: FontWeight.bold),
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   Text(
                     widget.vocal.syllables,
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ],
               ),

@@ -18,6 +18,7 @@ Future<void> signUp(User user) async {
     showToast("Signed up successfully");
     switchScreenAndRemoveAll(signInScreen);
   } on auth.FirebaseAuthException catch (e) {
+    CustomProgressDialog.hideProDialog();
     if (e.code == 'weak-password') {
       showToast('The password provided is too weak.');
     } else if (e.code == 'email-already-in-use') {

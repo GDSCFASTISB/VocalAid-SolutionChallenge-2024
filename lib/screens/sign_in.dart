@@ -4,6 +4,8 @@ import 'package:gdscapp/screens/sign_up.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+import '../index.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -172,10 +174,6 @@ class _LoginPageState extends State<LoginPage> {
                         if (_formkey.currentState!.validate()) {
                           _formkey.currentState!.save();
                           signIn(_email, _password);
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => const HomePage()));
                         }
                       },
                       style: ElevatedButton.styleFrom(
