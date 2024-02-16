@@ -25,8 +25,11 @@ class _WordListState extends State<WordList> {
     DBHandler db = DBHandler.getDBHandler();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Speech Enhancement'),
+        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: const Text(
+          'Words',
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -63,8 +66,8 @@ class _WordListState extends State<WordList> {
                           child: ListTile(
                             title: Text(
                               vocals.words,
-                              style: const TextStyle(
-                                  color: Colors.white,
+                              style: TextStyle(
+                                  color: colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 24),
                             ),
@@ -73,10 +76,10 @@ class _WordListState extends State<WordList> {
                               children: [
                                 Text(
                                   vocals.syllables,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontStyle: FontStyle.italic,
                                       fontSize: 16,
-                                      color: Colors.white),
+                                      color: colorScheme.onSurface),
                                 ),
                                 const Spacer(),
                               ],

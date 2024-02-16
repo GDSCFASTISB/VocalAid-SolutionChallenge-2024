@@ -19,7 +19,7 @@ class CustomCard extends Card {
       width: MediaQuery.of(context).size.width * 0.8,
       padding: EdgeInsets.all(paddings ?? 10),
       child: Card(
-          color: color ?? const Color(0xFF008A70),
+          color: color ?? colorScheme.surface,
           child:
               Container(margin: EdgeInsets.all(margins ?? 10), child: child)),
     );

@@ -36,4 +36,4 @@ const wordListScreen = "/wordList";
 var fBAuth = FirebaseAuth.instance;
 var storage = FirebaseStorage.instance.ref();
 final orginalRecordingsStorage = storage.child("orginalRecordings");
-var themeColor = const Color(0xFF008A70);
+var colorScheme = Theme.of(appNavigationKey.currentContext!).colorScheme;

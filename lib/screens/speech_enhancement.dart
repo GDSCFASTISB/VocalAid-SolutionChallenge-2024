@@ -107,8 +107,11 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Speech Enhancement'),
+        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: const Text(
+          'Speech Enhancement',
+        ),
       ),
       body: Center(
         child: Column(
@@ -118,17 +121,17 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                 children: [
                   Text(
                     widget.vocal.words,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                        color: colorScheme.onSurface),
                   ),
                   Text(
                     widget.vocal.syllables,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                        color: colorScheme.onSurface),
                   ),
                 ],
               ),
@@ -183,7 +186,7 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                                   textStyle: GoogleFonts.lato(
                                     fontSize: 65,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: colorScheme.onSurface,
                                   ),
                                 ),
                               ],
