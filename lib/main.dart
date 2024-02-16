@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF008A70)),
-          scaffoldBackgroundColor: colorScheme.background,
+          scaffoldBackgroundColor: Colors.white,
           useMaterial3: true,
         ),
         navigatorKey: appNavigationKey,
