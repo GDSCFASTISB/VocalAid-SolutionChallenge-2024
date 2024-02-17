@@ -32,6 +32,7 @@ const signInScreen = "/signIn";
 const signUpScreen = "/signUp";
 const speechEnhancementScreen = "/speechEnhancementScreen";
 const wordListScreen = "/wordList";
+const historyListScreen = "/historyList";
 const homePageScreen = "/homePage";
 
 // Firebase

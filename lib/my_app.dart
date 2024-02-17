@@ -1,4 +1,5 @@
 import 'package:gdscapp/index.dart';
+import 'package:gdscapp/screens/history_list.dart';
 import 'package:gdscapp/screens/home_page.dart';
 import 'package:gdscapp/screens/sign_in.dart';
 import 'package:gdscapp/screens/sign_up.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
           signInScreen: (context) => const LoginPage(),
           signUpScreen: (context) => const SignUp(),
           wordListScreen: (context) => const WordList(),
+          historyListScreen: (context) => const HistoryList(),
           homePageScreen: (context) => const MyHomePage(),
         });
   }
