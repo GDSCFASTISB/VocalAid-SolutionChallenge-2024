@@ -16,13 +16,17 @@ Future<void> signIn(String email, String pass) async {
 
       if (user != null) {
         print("signed in");
-        switchScreen(wordListScreen);
+        UserPreferences.user = user;
+        UserPreferences.userSignedIn = true;
+
+        switchScreenAndRemoveAll(homePageScreen);
       } else {
         showToast("user credentials not found");
       }
     });
   } on auth.FirebaseAuthException catch (e) {
     print(e);
+    showToast("user credentials not found");
     CustomProgressDialog.hideProDialog();
     if (e.code == 'user-not-found') {
       showToast('No user found for that email.');

@@ -32,8 +32,21 @@ const signInScreen = "/signIn";
 const signUpScreen = "/signUp";
 const speechEnhancementScreen = "/speechEnhancementScreen";
 const wordListScreen = "/wordList";
+const homePageScreen = "/homePage";
 
+// Firebase
 var fBAuth = FirebaseAuth.instance;
 var storage = FirebaseStorage.instance.ref();
-final orginalRecordingsStorage = storage.child("orginalRecordings");
+
+//Color Scheme
 var colorScheme = Theme.of(appNavigationKey.currentContext!).colorScheme;
+
+//Storages
+final orginalRecordingsStorage = storage.child("orginalRecordings");
+
+///   KEYS FOR PREFERENCES
+const keyUser = "user";
+const keySignedIn = "signedIn";
+const keyRememberMe = "rememberMe";
+const String keyUsername = 'username';
+const String keyPassword = 'password';

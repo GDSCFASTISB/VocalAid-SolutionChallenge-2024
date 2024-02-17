@@ -100,7 +100,11 @@ class ContinuousProgressPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Colors.green
+      ..color = accuracy <= 30
+          ? Colors.red
+          : accuracy <= 60
+              ? Colors.orange
+              : Colors.green
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 10.0
       ..style = PaintingStyle.stroke;

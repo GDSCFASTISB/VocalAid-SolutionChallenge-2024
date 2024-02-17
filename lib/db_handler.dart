@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gdscapp/DataModels/vocals.dart';
+import 'package:gdscapp/DataModels/history.dart';
 import 'package:gdscapp/index.dart';
 
 class DBHandler {
@@ -8,6 +8,7 @@ class DBHandler {
   var db = FirebaseFirestore.instance;
   final dbUsers = "users";
   final dbVocals = "vocals";
+  final dbHistory = "history";
 
   // Private constructor
   DBHandler._();
@@ -44,5 +45,47 @@ class DBHandler {
       print('Error retrieving vocals: $e');
       return [];
     }
+  }
+
+  Future<Vocals> getVocalDetail(String word) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await db.collection(dbVocals).where('words', isEqualTo: word).get();
+      if (querySnapshot.docs.isNotEmpty) {
+        // Check if the query result is not empty
+        DocumentSnapshot docSnapshot = querySnapshot.docs[0];
+        Vocals vocal =
+            Vocals.fromJson(docSnapshot.data() as Map<String, dynamic>);
+        return vocal;
+      } else {
+        // Handle the case when no documents are found
+        print('No documents found for word: $word');
+        return Vocals(); // Or return a default or null object as needed
+      }
+    } catch (e) {
+      print('Error retrieving vocals: $e');
+      return Vocals();
+    }
+  }
+
+  Future<List<History>> getHistory(String userID) async {
+    try {
+      QuerySnapshot querySnapshot = await db
+          .collection(dbHistory)
+          .where('userID', isEqualTo: userID)
+          .get();
+      List<History> historyList = querySnapshot.docs
+          .map((doc) => History.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      return historyList;
+    } catch (e) {
+      print('Error retrieving vocals: $e');
+      return [];
+    }
+  }
+
+  void setHistory(History history) async {
+    await db.collection(dbHistory).doc().set(history.toJson());
   }
 }
