@@ -2,7 +2,7 @@ import 'package:gdscapp/index.dart';
 
 class CustomCard extends Card {
   final Widget child;
-  final Color? color;
+  final Color? colorn;
   final double? paddings;
   final double? margins;
   final double? width;
@@ -11,7 +11,7 @@ class CustomCard extends Card {
   const CustomCard({
     super.key,
     required this.child,
-    this.color,
+    this.colorn,
     this.paddings,
     this.margins,
     this.width,
@@ -26,8 +26,7 @@ class CustomCard extends Card {
       padding: EdgeInsets.all(paddings ?? 10),
       child: Card(
           elevation: 5,
-          color: color ?? colorScheme.surface,
-          elevation: 8,
+          color: colorn ?? colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),

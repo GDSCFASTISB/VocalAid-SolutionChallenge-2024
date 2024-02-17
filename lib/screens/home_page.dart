@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     CustomCard(
-                      color: colorScheme.surface,
+                      colorn: colorScheme.surface,
                       paddings: 0,
                       margins: 20,
                       child: InkWell(
@@ -153,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       height: 20,
                     ),
                     CustomCard(
-                      color: colorScheme.surface,
+                      colorn: colorScheme.surface,
                       paddings: 0,
                       margins: 5,
                       child: Column(
@@ -242,7 +242,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: ButtomNavBar(),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 0,
+      ),
     );
   }
 }

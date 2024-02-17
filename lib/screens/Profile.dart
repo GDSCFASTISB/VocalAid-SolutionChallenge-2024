@@ -20,7 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
           child: Text(
-            'Homepage',
+            'My Profile',
             style:
                 GoogleFonts.manrope(fontSize: 33, fontWeight: FontWeight.bold),
           ),
@@ -54,12 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: const EdgeInsets.only(bottom: 5),
                       child: Row(
                         children: [
-                          Text('Welcome, ',
-                              style: GoogleFonts.manrope(
-                                  fontSize: 18,
-                                  color: Color(0xFF00856C),
-                                  fontWeight: FontWeight.w600)),
-                          Text('Kashan Ali',
+                          Text(UserPreferences.user.name,
                               style: GoogleFonts.manrope(
                                   fontSize: 18, fontWeight: FontWeight.w500)),
                         ],
@@ -104,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: Colors.black,
                         ),
                         Text(
-                          '  maherkashan7@gmail.com',
+                          UserPreferences.user.emailAddress,
                           style: GoogleFonts.manrope(
                               fontSize: 13, fontWeight: FontWeight.w400),
                         )
@@ -542,6 +537,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ), // SizedBox(
       ]),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 1,
+      ),
     );
   }
 }

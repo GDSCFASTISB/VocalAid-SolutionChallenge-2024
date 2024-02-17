@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:gdscapp/index.dart';
 
-class ButtomNavBar extends StatefulWidget {
-  ButtomNavBar({super.key});
+class BottomNavBar extends StatefulWidget {
+  final int currentIndex;
+  const BottomNavBar({super.key, required this.currentIndex});
   @override
   @override
-  State<ButtomNavBar> createState() => ButtomNavbarState();
+  State<BottomNavBar> createState() => BottomNavBarState();
 }
 
-class ButtomNavbarState extends State<ButtomNavBar> {
-  int currentIndex = 0;
-
+class BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-        currentIndex: currentIndex,
+        currentIndex: widget.currentIndex,
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
@@ -24,12 +23,12 @@ class ButtomNavbarState extends State<ButtomNavBar> {
   }
 
   void _onItemTapped(int index) async {
-    setState(() {
-      currentIndex = index;
-    });
-
-    if (index == 0) {
-    } else if (index == 1) {
-    } else {}
+    if (index != widget.currentIndex) {
+      if (index == 0) {
+        switchScreenAndRemoveAll(homePageScreen);
+      } else if (index == 1) {
+        switchScreen(profileScreen);
+      } else {}
+    }
   }
 }
