@@ -87,8 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      MenuItem("Word", wordListScreen),
-                      MenuItem("Histroy", "")
+                      menuItem("Word", wordListScreen),
+                      menuItem("Histroy", "")
                     ],
                   ),
                 ),
@@ -221,10 +221,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Widget MenuItem(String label, String Screen) {
+Widget menuItem(String label, String screen) {
   return TextButton(
     onPressed: () {
-      switchScreen(Screen);
+      switchScreen(screen);
     },
     child: CustomCard(
       width: 200,
