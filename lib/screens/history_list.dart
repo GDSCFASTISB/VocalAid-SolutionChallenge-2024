@@ -58,6 +58,10 @@ class _HistoryListState extends State<HistoryList> {
                         child: Text("Error Loading data"),
                       );
                     }
+                    if (!snap.hasData || snap.data!.isEmpty) {
+                      // If the Future completed successfully, but the data is empty
+                      return const Center(child: Text('No data available.'));
+                    }
                     return ListView.builder(
                       itemCount: snap.data?.length ?? 0,
                       itemBuilder: (BuildContext context, int index) {

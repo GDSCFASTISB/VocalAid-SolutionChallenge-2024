@@ -4,7 +4,7 @@ import 'my_app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  initializeFirebase();
+  await initializeFirebase();
   await initializePreferences();
   runApp(const MyApp());
 }
