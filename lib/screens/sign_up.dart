@@ -1,5 +1,6 @@
 import 'package:gdscapp/auth_fuctions/sign_up_func.dart';
-
+import 'package:gdscapp/screens/Profile.dart';
+import 'package:gdscapp/screens/Profile.dart';
 import '../index.dart';
 
 class SignUp extends StatefulWidget {
@@ -126,7 +127,7 @@ class _SignUpState extends State<SignUp> {
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
                 decoration: InputDecoration(
                     label: const Text('password'),
@@ -242,7 +243,7 @@ conditions''',
                 ),
                 TextButton(
                     onPressed: () {
-                      switchScreenAndRemoveAll(signInScreen);
+                      switchScreenWithData(ProfilePage());
                     },
                     child: const Text(
                       'Sign in',
