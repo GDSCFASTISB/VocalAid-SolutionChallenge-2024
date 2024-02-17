@@ -5,7 +5,7 @@ package="com.gdsc.solution_challenge">
 
     
     <application
-        android:label="gdscapp"
+        android:label="VocalAid"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

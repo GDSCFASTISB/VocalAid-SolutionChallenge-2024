@@ -16,12 +16,15 @@ export 'package:gdscapp/firebase_options.dart';
 export 'package:gdscapp/db_handler.dart';
 export 'package:gdscapp/top_level_elements.dart';
 export 'package:gdscapp/validator.dart';
+export 'package:gdscapp/shared_preferences.dart';
 export 'package:gdscapp/widgets/progress_dialog.dart';
 
 //Custom Widgets
 export "package:gdscapp/widgets/custom_card.dart";
 export 'package:gdscapp/widgets/circular_accuracy_widget.dart';
 export "package:gdscapp/widgets/custom_text.dart";
+export "package:gdscapp/widgets/bottom_nav_bar.dart";
+export "package:gdscapp/widgets/bar_chart.dart";
 
 // Dart Libraries
 export "dart:io";

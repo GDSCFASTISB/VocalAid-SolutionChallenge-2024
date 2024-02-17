@@ -21,9 +21,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Form(
-            key: _formkey,
-            child: Column(
+      body: Form(
+        key: _formkey,
+        child: Stack(
+          children: [
+            // Center(child: Image.asset('assets/logo.png')),
+            Column(
               children: [
                 SizedBox(height: MediaQuery.of(context).size.height * 0.25),
                 Align(
@@ -208,6 +211,10 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 )
               ],
-            )));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
