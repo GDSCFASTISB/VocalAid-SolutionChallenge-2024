@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import "package:gdscapp/index.dart";
+import 'package:gdscapp/screens/Profile.dart';
 
 Future<void> signIn(String email, String pass) async {
   DBHandler db = DBHandler.getDBHandler();
@@ -16,7 +17,7 @@ Future<void> signIn(String email, String pass) async {
 
       if (user != null) {
         print("signed in");
-        switchScreen(wordListScreen);
+        switchScreenWithData(ProfilePage());
       } else {
         showToast("user credentials not found");
       }

@@ -20,6 +20,10 @@ class CustomCard extends Card {
       padding: EdgeInsets.all(paddings ?? 10),
       child: Card(
           color: color ?? colorScheme.surface,
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
           child:
               Container(margin: EdgeInsets.all(margins ?? 10), child: child)),
     );
