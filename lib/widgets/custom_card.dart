@@ -27,7 +27,7 @@ class CustomCard extends Card {
       child: Card(
           elevation: 5,
           color: color ?? colorScheme.surface,
-          elevation: 8,
+          //elevation: 8,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
