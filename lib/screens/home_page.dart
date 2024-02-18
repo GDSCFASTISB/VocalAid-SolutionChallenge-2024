@@ -242,7 +242,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: ButtomNavBar(),
+      bottomNavigationBar: ButtomNavBar(
+        currentIndex: 0,
+      ),
     );
   }
 }

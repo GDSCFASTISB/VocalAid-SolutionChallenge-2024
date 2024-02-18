@@ -542,6 +542,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ), // SizedBox(
       ]),
+      bottomNavigationBar: ButtomNavBar(
+        currentIndex: 1,
+      ),
     );
   }
 }

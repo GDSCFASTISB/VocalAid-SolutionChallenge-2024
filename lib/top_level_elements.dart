@@ -34,6 +34,8 @@ const speechEnhancementScreen = "/speechEnhancementScreen";
 const wordListScreen = "/wordList";
 const historyListScreen = "/historyList";
 const homePageScreen = "/homePage";
+const profileScreen = "/profile";
+const challengeScreen = "/challenge";
 
 // Firebase
 var fBAuth = FirebaseAuth.instance;
