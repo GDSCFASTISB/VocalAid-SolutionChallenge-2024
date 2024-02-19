@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gdscapp/index.dart';
+import 'package:gdscapp/screens/Profile.dart';
 
 class BottomNavBar extends StatefulWidget {
   final int currentIndex;
@@ -18,17 +19,20 @@ class BottomNavBarState extends State<BottomNavBar> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings")
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: "Challenge")
         ]);
   }
 
   void _onItemTapped(int index) async {
     if (index != widget.currentIndex) {
       if (index == 0) {
-        switchScreenAndRemoveAll(homePageScreen);
+        switchScreen(homePageScreen);
       } else if (index == 1) {
         switchScreen(profileScreen);
-      } else {}
+      } else {
+        switchScreen(challengeScreen);
+      }
     }
   }
 }

@@ -1,10 +1,11 @@
 import 'package:gdscapp/index.dart';
-import 'package:gdscapp/screens/Profile.dart';
+import 'package:gdscapp/screens/challenge_screen.dart';
 import 'package:gdscapp/screens/history_list.dart';
 import 'package:gdscapp/screens/home_page.dart';
 import 'package:gdscapp/screens/sign_in.dart';
 import 'package:gdscapp/screens/sign_up.dart';
 import 'package:gdscapp/screens/words_list.dart';
+import 'package:gdscapp/screens/profile.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
           historyListScreen: (context) => const HistoryList(),
           homePageScreen: (context) => const MyHomePage(),
           profileScreen: (context) => const ProfilePage(),
+          challengeScreen: (context) => const Challenge_screen(),
         });
   }
 }
