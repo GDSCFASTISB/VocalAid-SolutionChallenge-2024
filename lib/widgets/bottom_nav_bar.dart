@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:gdscapp/index.dart';
 import 'package:gdscapp/screens/Profile.dart';
 
-class ButtomNavBar extends StatefulWidget {
-  ButtomNavBar({super.key, required this.currentIndex});
+class BottomNavBar extends StatefulWidget {
   final int currentIndex;
+  const BottomNavBar({super.key, required this.currentIndex});
   @override
   @override
-  State<ButtomNavBar> createState() => ButtomNavbarState();
+  State<BottomNavBar> createState() => BottomNavBarState();
 }
 
-class ButtomNavbarState extends State<ButtomNavBar> {
+class BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
