@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:gdscapp/screens/home_page.dart';
+
 import '../index.dart';
 
 import 'dart:math' as math;
@@ -20,6 +22,10 @@ class SpeechEnhancement extends StatefulWidget {
 }
 
 class _SpeechEnhancementState extends State<SpeechEnhancement> {
+  double accuracy = 65;
+  bool improvement = false;
+  String modelOutput = "";
+  String groundTruth = "friensdjhvness";
   final progressStream = BehaviorSubject<WaveformProgress>();
   final progressStreamOriginal = BehaviorSubject<WaveformProgress>();
 
@@ -38,6 +44,7 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
   void initState() {
     super.initState();
     _recorder = AudioRecorder();
+    modelOutput = widget.vocal.words;
     // _player = AudioPlayer();
     _init();
 
@@ -86,22 +93,30 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
     }
   }
 
+  String replaceDotWithDash(String input) {
+    return input.replaceAll('.', '-');
+  }
+
+  void updateAccuracy(double accuracyNew) {
+    accuracy = accuracyNew;
+  }
+
   Future<void> _initOriginalRecording() async {
     try {
-      final waveFile =
-          File(p.join((await getTemporaryDirectory()).path, 'waveform.wave'));
+      final waveFile = File(p.join(
+          (await getTemporaryDirectory()).path, 'waveformOriginal.wave'));
       try {
         JustWaveform.extract(
                 audioInFile: File(audioPath), waveOutFile: waveFile)
-            .listen(progressStream.add, onError: (error) {
+            .listen(progressStreamOriginal.add, onError: (error) {
           print("Error during waveform extraction: $error");
-          progressStream.addError(error);
+          progressStreamOriginal.addError(error);
         });
       } catch (e) {
         print("Exception caught during waveform extraction setup: $e");
       }
     } catch (e) {
-      progressStream.addError(e);
+      progressStreamOriginal.addError(e);
     }
   }
 
@@ -214,94 +229,274 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
           'Speech Enhancement',
         ),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            CustomCard(
-              child: Column(
-                children: [
-                  Text(
-                    widget.vocal.words,
-                    style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface),
-                  ),
-                  Text(
-                    widget.vocal.syllables,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface),
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      _recording = !_recording;
-                      _recordingDone = false;
-                    });
-                    List<double> newSamples = [];
-                    List<double> initOrigSamples = [];
-                    if (_recording) {
-                      await _record();
-                    } else {
-                      await _stopRecording().then((value) async {});
-                      _recordingDone = true;
-
-                      setState(() {
-                        samples = newSamples;
-                        originalSamples = initOrigSamples;
-                      });
-                    }
-
-                    print('Recording: $_recording');
-                  },
-                  child: Icon(_recording ? Icons.stop : Icons.mic),
-                ),
-                if (!_recording)
-                  ElevatedButton(
-                    onPressed: () async {},
-                    child: const Icon(Icons.refresh),
-                  ),
-              ],
-            ),
-            Visibility(
-              visible: _recordingDone,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        padding: EdgeInsets.only(bottom: 50),
+        child: Center(
+          child: Column(
+            children: [
+              CustomCard(
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const AnimatedCircularProgressWidget(
-                          accuracy: 70,
-                        ),
-                        Column(
-                          children: [
-                            AnimatedTextKit(
-                              animatedTexts: [
-                                WavyAnimatedText(
-                                  '$points',
-                                  textStyle: GoogleFonts.lato(
-                                    fontSize: 65,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
+                    _recordingDone
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: spans,
+                                  style: TextStyle(
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface),
                                 ),
-                              ],
-                              isRepeatingAnimation: false,
-                              onTap: () {
-                                print("Tap Event");
+                              ),
+                            ],
+                          )
+                        : Text(
+                            widget.vocal.words,
+                            style: TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface),
+                          ),
+                    Text(
+                      widget.vocal.syllables,
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface),
+                    ),
+                  ],
+                ),
+              ),
+
+              Visibility(
+                visible: improvement,
+                child: Column(
+                  children: [
+                    CustomCard(
+                        child: Center(
+                      child: CustomText(
+                        text: replaceDotWithDash(widget.vocal.syllables),
+                        fontSize: 30,
+                      ),
+                    )),
+                    Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 150.0,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(20.0)),
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            width: double.maxFinite,
+                            child: StreamBuilder<WaveformProgress>(
+                              stream: progressStream,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text(
+                                      'Error: ${snapshot.error}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  );
+                                }
+                                final progress = snapshot.data?.progress ?? 0.0;
+                                final waveform = snapshot.data?.waveform;
+                                if (waveform == null) {
+                                  return Center(
+                                    child: Text(
+                                      '${(100 * progress).toInt()}%',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
+                                    ),
+                                  );
+                                }
+                                return AudioWaveformWidget(
+                                  waveform: waveform,
+                                  start: Duration.zero,
+                                  duration: waveform.duration,
+                                );
                               },
                             ),
-                            const CustomText(text: "You scored"),
+                          ),
+                          CustomText(text: "Original Prononciation")
+                        ],
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 150.0,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(20.0)),
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            width: double.maxFinite,
+                            child: StreamBuilder<WaveformProgress>(
+                              stream: progressStreamOriginal,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text(
+                                      'Error: ${snapshot.error}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  );
+                                }
+                                final progress = snapshot.data?.progress ?? 0.0;
+                                final waveform = snapshot.data?.waveform;
+                                if (waveform == null) {
+                                  return Center(
+                                    child: Text(
+                                      '${(100 * progress).toInt()}%',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
+                                    ),
+                                  );
+                                }
+                                return AudioWaveformWidget(
+                                  waveform: waveform,
+                                  start: Duration.zero,
+                                  duration: waveform.duration,
+                                );
+                              },
+                            ),
+                          ),
+                          CustomText(text: "Your Prononciation")
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        _recording = !_recording;
+                        _recordingDone = false;
+                      });
+                      if (_recording) {
+                        spans = [];
+                        await _record();
+                      } else {
+                        await _stopRecording().then((value) async {
+                          await _initOriginalRecording();
+                        });
+                        _recordingDone = true;
+                        buildSpan();
+                        setState(() {
+                          // samples = newSamples;
+                          // originalSamples = initOrigSamples;
+                          accuracy = calculateAccuracy() * 100;
+                        });
+                      }
+
+                      print('Recording: $_recording');
+                    },
+                    child: Icon(_recording ? Icons.stop : Icons.mic),
+                  ),
+                  if (!_recording)
+                    ElevatedButton(
+                      onPressed: () async {},
+                      child: const Icon(Icons.refresh),
+                    ),
+                ],
+              ),
+              Visibility(
+                visible: _recordingDone,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          AnimatedCircularProgressWidget(accuracy: accuracy),
+                          Column(
+                            children: [
+                              AnimatedTextKit(
+                                animatedTexts: [
+                                  WavyAnimatedText(
+                                    '$points',
+                                    textStyle: GoogleFonts.lato(
+                                      fontSize: 65,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                                isRepeatingAnimation: false,
+                                onTap: () {
+                                  print("Tap Event");
+                                },
+                              ),
+                              const CustomText(text: "You scored"),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: accuracy <= 70 && _recordingDone,
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Column(
+                      children: [
+                        const CustomText(
+                          text: "Do you want to improve this word?",
+                          fontSize: 18,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _recordingDone = false;
+                                    improvement = true;
+                                  });
+                                },
+                                child: const Text("Yes")),
+                            ElevatedButton(
+                                onPressed: () {
+                                  switchScreenAndRemoveAll(homePageScreen);
+                                },
+                                child: const Text("No")),
                           ],
                         ),
                       ],
@@ -309,142 +504,103 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                   ],
                 ),
               ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                height: 150.0,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: const BorderRadius.all(Radius.circular(20.0)),
-                ),
-                padding: const EdgeInsets.all(16.0),
-                width: double.maxFinite,
-                child: StreamBuilder<WaveformProgress>(
-                  stream: progressStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Error: ${snapshot.error}',
-                          style: Theme.of(context).textTheme.titleLarge,
-                          textAlign: TextAlign.center,
-                        ),
-                      );
-                    }
-                    final progress = snapshot.data?.progress ?? 0.0;
-                    final waveform = snapshot.data?.waveform;
-                    if (waveform == null) {
-                      return Center(
-                        child: Text(
-                          '${(100 * progress).toInt()}%',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      );
-                    }
-                    return AudioWaveformWidget(
-                      waveform: waveform,
-                      start: Duration.zero,
-                      duration: waveform.duration,
-                    );
-                  },
-                ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                height: 150.0,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: const BorderRadius.all(Radius.circular(20.0)),
-                ),
-                padding: const EdgeInsets.all(16.0),
-                width: double.maxFinite,
-                child: StreamBuilder<WaveformProgress>(
-                  stream: progressStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Error: ${snapshot.error}',
-                          style: Theme.of(context).textTheme.titleLarge,
-                          textAlign: TextAlign.center,
-                        ),
-                      );
-                    }
-                    final progress = snapshot.data?.progress ?? 0.0;
-                    final waveform = snapshot.data?.waveform;
-                    if (waveform == null) {
-                      return Center(
-                        child: Text(
-                          '${(100 * progress).toInt()}%',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      );
-                    }
-                    return AudioWaveformWidget(
-                      waveform: waveform,
-                      start: Duration.zero,
-                      duration: waveform.duration,
-                    );
-                  },
-                ),
-              ),
-            ),
 
-            // Visibility(
-            //   visible: _recordingDone,
-            //   child: Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       const SizedBox(
-            //         height: 20,
-            //       ),
-            //       CustomCard(
-            //         margins: 20,
-            //         paddings: 0,
-            //         child: Column(
-            //           children: [
-            //             WaveformDisplay(samples),
-            //             const SizedBox(
-            //               height: 5,
-            //             ),
-            //             CustomText(
-            //               text: "Your Prononciation",
-            //               color: colorScheme.onBackground,
-            //             )
-            //           ],
-            //         ),
-            //       ),
-            //       const SizedBox(
-            //         height: 20,
-            //       ),
-            //       CustomCard(
-            //         margins: 20,
-            //         paddings: 0,
-            //         child: Column(
-            //           children: [
-            //             WaveformDisplay(originalSamples),
-            //             const SizedBox(
-            //               height: 5,
-            //             ),
-            //             CustomText(
-            //               text: "Original Prononciation",
-            //               color: colorScheme.onBackground,
-            //             )
-            //           ],
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-          ],
+              // Visibility(
+              //   visible: _recordingDone,
+              //   child: Column(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       const SizedBox(
+              //         height: 20,
+              //       ),
+              //       CustomCard(
+              //         margins: 20,
+              //         paddings: 0,
+              //         child: Column(
+              //           children: [
+              //             WaveformDisplay(samples),
+              //             const SizedBox(
+              //               height: 5,
+              //             ),
+              //             CustomText(
+              //               text: "Your Prononciation",
+              //               color: colorScheme.onBackground,
+              //             )
+              //           ],
+              //         ),
+              //       ),
+              //       const SizedBox(
+              //         height: 20,
+              //       ),
+              //       CustomCard(
+              //         margins: 20,
+              //         paddings: 0,
+              //         child: Column(
+              //           children: [
+              //             WaveformDisplay(originalSamples),
+              //             const SizedBox(
+              //               height: 5,
+              //             ),
+              //             CustomText(
+              //               text: "Original Prononciation",
+              //               color: colorScheme.onBackground,
+              //             )
+              //           ],
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  List<TextSpan> spans = [];
+
+  void buildSpan() {
+    int gtPointer = 0;
+    int correctCount = 0;
+    for (int i = 0; i < modelOutput.length; i++) {
+      final moChar = modelOutput[i];
+      if (gtPointer < groundTruth.length && moChar == groundTruth[gtPointer]) {
+        spans
+            .add(TextSpan(text: moChar, style: TextStyle(color: Colors.green)));
+        correctCount++;
+        gtPointer++;
+      } else {
+        if (gtPointer < groundTruth.length) {
+          spans
+              .add(TextSpan(text: moChar, style: TextStyle(color: Colors.red)));
+          spans.add(TextSpan(
+              // text: " [Expected: ${groundTruth[gtPointer]}]",
+              style: TextStyle(color: Colors.blue)));
+          gtPointer++;
+        } else {
+          spans
+              .add(TextSpan(text: moChar, style: TextStyle(color: Colors.red)));
+        }
+      }
+    }
+  }
+
+  double calculateAccuracy() {
+    int correctCount = 0;
+    int gtPointer = 0;
+
+    for (int i = 0; i < modelOutput.length; i++) {
+      if (gtPointer < groundTruth.length &&
+          modelOutput[i] == groundTruth[gtPointer]) {
+        correctCount++;
+      }
+      if (gtPointer < groundTruth.length) {
+        gtPointer++;
+      }
+    }
+
+    return correctCount / groundTruth.length;
   }
 }
 
