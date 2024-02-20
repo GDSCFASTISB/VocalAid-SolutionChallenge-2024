@@ -8,8 +8,6 @@
 1. [Project Overview](#project-overview)
 2. [Goals](#goals)
 3. [Technologies](#Technologies)
-   - [Prerequisites](#prerequisites)
-   - [Installation](#installation)
 4. [Usage](#usage)
 5. [Contributing](#contributing)
 6. [License](#license)
