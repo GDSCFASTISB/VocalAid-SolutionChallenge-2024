@@ -1,16 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:flutter/services.dart';
-import 'package:flutter_audio_waveforms/flutter_audio_waveforms.dart';
-import 'package:gdscapp/widgets/waveform.dart';
-
 import '../index.dart';
 
 import 'dart:math' as math;
 
-import 'dart:math';
-import 'dart:convert';
-import 'package:flutter_sound/flutter_sound.dart';
+import 'package:path/path.dart' as p;
+import 'package:rxdart/rxdart.dart';
+import 'package:just_waveform/just_waveform.dart';
 
 class SpeechEnhancement extends StatefulWidget {
   final Vocals vocal;
@@ -24,8 +20,13 @@ class SpeechEnhancement extends StatefulWidget {
 }
 
 class _SpeechEnhancementState extends State<SpeechEnhancement> {
-  List<double> samples = [];
+  final progressStream = BehaviorSubject<WaveformProgress>();
+  final progressStreamOriginal = BehaviorSubject<WaveformProgress>();
 
+  List<double> samples = [];
+  List<double> originalSamples = [];
+
+  late String originalRecordingPath;
   late AudioRecorder _recorder;
   // late AudioPlayer _player;
   bool _recording = false;
@@ -38,6 +39,7 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
     super.initState();
     _recorder = AudioRecorder();
     // _player = AudioPlayer();
+    _init();
 
     _initRecorder();
   }
@@ -45,9 +47,93 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
   @override
   void dispose() {
     _recorder.dispose();
-
     super.dispose();
   }
+
+  Future<void> _init() async {
+    try {
+      Reference islandRef;
+      islandRef = orginalRecordingsStorage.child(widget.vocal.audioWaveUrl);
+      final appDocDir = await getTemporaryDirectory();
+      final filePath =
+          "${appDocDir.absolute.path}/${widget.vocal.audioWaveUrl}";
+      debugPrint(filePath);
+      final audioFile = File(filePath);
+
+      try {
+        await islandRef.writeToFile(audioFile);
+      } on FirebaseException catch (e) {
+        // Handle Firebase Storage exception here.
+        print("Firebase Storage Error: $e");
+      } catch (e) {
+        // Handle other exceptions.
+        print("Error: $e");
+        //Navigator.pop(context);
+      }
+      final waveFile =
+          File(p.join((await getTemporaryDirectory()).path, 'waveform.wave'));
+      try {
+        JustWaveform.extract(audioInFile: audioFile, waveOutFile: waveFile)
+            .listen(progressStream.add, onError: (error) {
+          print("Error during waveform extraction: $error");
+          progressStream.addError(error);
+        });
+      } catch (e) {
+        print("Exception caught during waveform extraction setup: $e");
+      }
+    } catch (e) {
+      progressStream.addError(e);
+    }
+  }
+
+  Future<void> _initOriginalRecording() async {
+    try {
+      final waveFile =
+          File(p.join((await getTemporaryDirectory()).path, 'waveform.wave'));
+      try {
+        JustWaveform.extract(
+                audioInFile: File(audioPath), waveOutFile: waveFile)
+            .listen(progressStream.add, onError: (error) {
+          print("Error during waveform extraction: $error");
+          progressStream.addError(error);
+        });
+      } catch (e) {
+        print("Exception caught during waveform extraction setup: $e");
+      }
+    } catch (e) {
+      progressStream.addError(e);
+    }
+  }
+
+  // Future<void> fetchOriginalRecording() async {
+  //   try {
+  //     Reference islandRef;
+  //     islandRef = orginalRecordingsStorage.child(widget.vocal.audioWaveUrl);
+  //     final appDocDir = await getTemporaryDirectory();
+  //     final filePath =
+  //         "${appDocDir.absolute.path}/${widget.vocal.audioWaveUrl}";
+  //     debugPrint(filePath);
+  //     final file = File(filePath);
+
+  //     try {
+  //       await islandRef.writeToFile(file);
+  //     } on FirebaseException catch (e) {
+  //       // Handle Firebase Storage exception here.
+  //       print("Firebase Storage Error: $e");
+  //     } catch (e) {
+  //       // Handle other exceptions.
+  //       print("Error: $e");
+  //       //Navigator.pop(context);
+  //     }
+
+  //     setState(() {
+  //       originalRecordingPath = filePath;
+  //     });
+  //   } catch (e) {
+  //     print("Error during download: $e");
+  //     // Navigator.pop(context);
+  //   }
+  // }
 
   Future<void> _initRecorder() async {
     final status = await Permission.microphone.request();
@@ -161,17 +247,16 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                       _recordingDone = false;
                     });
                     List<double> newSamples = [];
+                    List<double> initOrigSamples = [];
                     if (_recording) {
                       await _record();
                     } else {
-                      await _stopRecording().then((value) async {
-                        newSamples =
-                            await readWavFileSamplesNormalized(audioPath);
-                      });
+                      await _stopRecording().then((value) async {});
                       _recordingDone = true;
 
                       setState(() {
                         samples = newSamples;
+                        originalSamples = initOrigSamples;
                       });
                     }
 
@@ -186,12 +271,10 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                   ),
               ],
             ),
-            WaveformDisplay(samples),
-            const Spacer(),
             Visibility(
               visible: _recordingDone,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
+                padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
                 child: Column(
                   children: [
                     Row(
@@ -227,6 +310,137 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                 ),
               ),
             ),
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                height: 150.0,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                ),
+                padding: const EdgeInsets.all(16.0),
+                width: double.maxFinite,
+                child: StreamBuilder<WaveformProgress>(
+                  stream: progressStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Error: ${snapshot.error}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }
+                    final progress = snapshot.data?.progress ?? 0.0;
+                    final waveform = snapshot.data?.waveform;
+                    if (waveform == null) {
+                      return Center(
+                        child: Text(
+                          '${(100 * progress).toInt()}%',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      );
+                    }
+                    return AudioWaveformWidget(
+                      waveform: waveform,
+                      start: Duration.zero,
+                      duration: waveform.duration,
+                    );
+                  },
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                height: 150.0,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                ),
+                padding: const EdgeInsets.all(16.0),
+                width: double.maxFinite,
+                child: StreamBuilder<WaveformProgress>(
+                  stream: progressStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Error: ${snapshot.error}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }
+                    final progress = snapshot.data?.progress ?? 0.0;
+                    final waveform = snapshot.data?.waveform;
+                    if (waveform == null) {
+                      return Center(
+                        child: Text(
+                          '${(100 * progress).toInt()}%',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      );
+                    }
+                    return AudioWaveformWidget(
+                      waveform: waveform,
+                      start: Duration.zero,
+                      duration: waveform.duration,
+                    );
+                  },
+                ),
+              ),
+            ),
+
+            // Visibility(
+            //   visible: _recordingDone,
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       const SizedBox(
+            //         height: 20,
+            //       ),
+            //       CustomCard(
+            //         margins: 20,
+            //         paddings: 0,
+            //         child: Column(
+            //           children: [
+            //             WaveformDisplay(samples),
+            //             const SizedBox(
+            //               height: 5,
+            //             ),
+            //             CustomText(
+            //               text: "Your Prononciation",
+            //               color: colorScheme.onBackground,
+            //             )
+            //           ],
+            //         ),
+            //       ),
+            //       const SizedBox(
+            //         height: 20,
+            //       ),
+            //       CustomCard(
+            //         margins: 20,
+            //         paddings: 0,
+            //         child: Column(
+            //           children: [
+            //             WaveformDisplay(originalSamples),
+            //             const SizedBox(
+            //               height: 5,
+            //             ),
+            //             CustomText(
+            //               text: "Original Prononciation",
+            //               color: colorScheme.onBackground,
+            //             )
+            //           ],
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -279,105 +493,128 @@ Future<List<double>> readWavFileSamplesNormalized(String filePath) async {
       // Additional handling for other bits per sample if necessary
     }
   }
+
+  double max = 0;
   print(samples.length);
-  return samples;
+  for (int i = 0; i < 3000; i++) {
+    if (samples[i] > max) max = samples[i];
+    // print(samples[i]);
+    samples[i] = 0.0;
+  }
+  List<double> newSamples =
+      samples.skipWhile((value) => value < 0.006).toList();
+  print(max);
+  return newSamples;
 }
 
-// List<double> loadparseJson(String jsonBody) {
-//   final data = jsonDecode(jsonBody);
-//   final List<int> points = List.castFrom(data['data']);
-//   List<int> filteredData = [];
-//   // Change this value to number of audio samples you want.
-//   // Values between 256 and 1024 are good for showing [RectangleWaveform] and [SquigglyWaveform]
-//   // While the values above them are good for showing [PolygonWaveform]
-//   const int samples = 256;
-//   final double blockSize = points.length / samples;
-//   print(points.length);
-//   for (int i = 0; i < samples; i++) {
-//     final double blockStart =
-//         blockSize * i; // the location of the first sample in the block
-//     int sum = 0;
-//     for (int j = 0; j < blockSize; j++) {
-//       sum = sum +
-//           points[(blockStart + j)
-//               .toInt()]; // find the sum of all the samples in the block
-//     }
-//     filteredData.add((sum / blockSize)
-//         .round() // take the average of the block and add it to the filtered data
-//         .toInt()); // divide the sum by the block size to get the average
-//   }
-//   final maxNum = filteredData.reduce((a, b) => math.max(a.abs(), b.abs()));
+class AudioWaveformWidget extends StatefulWidget {
+  final Color waveColor;
+  final double scale;
+  final double strokeWidth;
+  final double pixelsPerStep;
+  final Waveform waveform;
+  final Duration start;
+  final Duration duration;
 
-//   final double multiplier = math.pow(maxNum, -1).toDouble();
+  const AudioWaveformWidget({
+    Key? key,
+    required this.waveform,
+    required this.start,
+    required this.duration,
+    this.waveColor = Colors.blue,
+    this.scale = 1.0,
+    this.strokeWidth = 5.0,
+    this.pixelsPerStep = 8.0,
+  }) : super(key: key);
 
-//   return filteredData.map<double>((e) => (e * multiplier)).toList();
-// }
+  @override
+  _AudioWaveformState createState() => _AudioWaveformState();
+}
 
-// Future<void> generateJsonRepresentation(
-//     String inputFilePath,
-//     String outputFilePath,
-//     int samples,
-//     int precision,
-//     bool normalize,
-//     bool logarithmic) async {
-//   final file = File(inputFilePath);
-//   final data = await file.readAsBytes();
-//   final buffer =
-//       (await FlutterSoundHelper().wavToPCM(inputFilePath: inputFilePath)).data!;
+class _AudioWaveformState extends State<AudioWaveformWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: CustomPaint(
+        painter: AudioWaveformPainter(
+          waveColor: widget.waveColor,
+          waveform: widget.waveform,
+          start: widget.start,
+          duration: widget.duration,
+          scale: widget.scale,
+          strokeWidth: widget.strokeWidth,
+          pixelsPerStep: widget.pixelsPerStep,
+        ),
+      ),
+    );
+  }
+}
 
-//   int numChannels =
-//       1; // Assuming mono for simplicity; modify as needed for stereo
-//   List<double> audioData = buffer.buffer.asFloat32List();
+class AudioWaveformPainter extends CustomPainter {
+  final double scale;
+  final double strokeWidth;
+  final double pixelsPerStep;
+  final Paint wavePaint;
+  final Waveform waveform;
+  final Duration start;
+  final Duration duration;
 
-//   // Linear Interpolation (simplified version)
-//   List<double> interpolatedData = linearInterpolation(audioData, samples);
+  AudioWaveformPainter({
+    required this.waveform,
+    required this.start,
+    required this.duration,
+    Color waveColor = Colors.blue,
+    this.scale = 1.0,
+    this.strokeWidth = 5.0,
+    this.pixelsPerStep = 8.0,
+  }) : wavePaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round
+          ..color = waveColor;
 
-//   if (logarithmic) {
-//     interpolatedData = interpolatedData.map((val) => lin2log(val)).toList();
-//   }
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (duration == Duration.zero) return;
 
-//   if (normalize) {
-//     double maxVal =
-//         interpolatedData.fold(0, (prev, curr) => max(prev.abs(), curr.abs()));
-//     interpolatedData = interpolatedData.map((val) => val / maxVal).toList();
-//   }
+    double width = size.width;
+    double height = size.height;
 
-//   // Convert to specified precision
-//   interpolatedData = interpolatedData
-//       .map((val) => double.parse(val.toStringAsFixed(precision)))
-//       .toList();
+    final waveformPixelsPerWindow = waveform.positionToPixel(duration).toInt();
+    final waveformPixelsPerDevicePixel = waveformPixelsPerWindow / width;
+    final waveformPixelsPerStep = waveformPixelsPerDevicePixel * pixelsPerStep;
+    final sampleOffset = waveform.positionToPixel(start);
+    final sampleStart = -sampleOffset % waveformPixelsPerStep;
+    for (var i = sampleStart.toDouble();
+        i <= waveformPixelsPerWindow + 1.0;
+        i += waveformPixelsPerStep) {
+      final sampleIdx = (sampleOffset + i).toInt();
+      final x = i / waveformPixelsPerDevicePixel;
+      final minY = normalise(waveform.getPixelMin(sampleIdx), height);
+      final maxY = normalise(waveform.getPixelMax(sampleIdx), height);
+      canvas.drawLine(
+        Offset(x + strokeWidth / 2, max(strokeWidth * 0.75, minY)),
+        Offset(x + strokeWidth / 2, min(height - strokeWidth * 0.75, maxY)),
+        wavePaint,
+      );
+    }
+  }
 
-//   // Output JSON
-//   Map<String, dynamic> jsonMap = {
-//     'data': interpolatedData,
-//   };
-//   final jsonString = jsonEncode(jsonMap);
-//   final outputFile = File(outputFilePath);
-//   await outputFile.writeAsString(jsonString);
-// }
+  @override
+  bool shouldRepaint(covariant AudioWaveformPainter oldDelegate) {
+    return false;
+  }
 
-// List<double> linearInterpolation(List<double> data, int samples) {
-//   int dataSize = data.length;
-//   List<double> result = List.filled(samples, 0);
-//   for (int i = 0; i < samples; i++) {
-//     double idx = (i * (dataSize - 1)) / (samples - 1);
-//     int idxInt = idx.toInt();
-//     double frac = idx - idxInt;
-//     double interpValue = data[idxInt] +
-//         (frac * (data[min(idxInt + 1, dataSize - 1)] - data[idxInt]));
-//     result[i] = interpValue;
-//   }
-//   return result;
-// }
-
-// double lin2log(double val) {
-//   const double referenceValue = 1.0;
-//   double dbValue = 20 * log(val / referenceValue) / ln10;
-//   // Clip to range -60dB to 0dB for simplicity, adjust as needed
-//   dbValue = max(-60, min(0, dbValue));
-//   // Map to range -1.0 to 1.0, adjust formula as needed
-//   return dbValue / 60;
-// }
+  double normalise(int s, double height) {
+    if (waveform.flags == 0) {
+      final y = 32768 + (scale * s).clamp(-32768.0, 32767.0).toDouble();
+      return height - 1 - y * height / 65536;
+    } else {
+      final y = 128 + (scale * s).clamp(-128.0, 127.0).toDouble();
+      return height - 1 - y * height / 256;
+    }
+  }
+}
 
 // final csvFile =
 //                       File('/Users/ryan/Developer/gdscapp/assets/data.csv')

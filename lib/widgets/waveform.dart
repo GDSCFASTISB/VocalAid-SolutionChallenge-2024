@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class WaveformPainter extends CustomPainter {
   final List<double> waveform;
+  final double maxHeight; // Maximum height above and below the center
 
-  WaveformPainter(this.waveform);
+  WaveformPainter(this.waveform, {this.maxHeight = 50.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -12,15 +13,25 @@ class WaveformPainter extends CustomPainter {
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
+    // Find the maximum absolute value in the waveform for normalization
+    double maxAbsValue = waveform.fold(
+        0.0,
+        (currentMax, value) =>
+            value.abs() > currentMax ? value.abs() : currentMax);
+
     Path path = Path();
     double centerY = size.height / 2;
     double step = size.width / waveform.length;
 
+    // Start the path in the middle of the Y axis
     path.moveTo(0, centerY);
 
     for (int i = 0; i < waveform.length; i++) {
       double x = i * step;
-      double y = (centerY - waveform[i] * 20 * centerY);
+      // Normalize the waveform value to fit within the maxHeight
+      double normalizedValue =
+          (waveform[i] / maxAbsValue) * maxHeight; // Normalization
+      double y = centerY - normalizedValue;
       path.lineTo(x, y);
     }
 
@@ -28,9 +39,7 @@ class WaveformPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 class WaveformDisplay extends StatelessWidget {

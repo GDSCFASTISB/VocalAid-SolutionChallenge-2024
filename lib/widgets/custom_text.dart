@@ -18,7 +18,8 @@ class CustomText extends Text {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: GoogleFonts.manrope(
+      style: GoogleFonts.dmSans(
+        height: 1,
         fontSize: fontSize ?? 20,
         fontWeight: fontWeight ?? FontWeight.normal,
         color: color ?? Colors.black,

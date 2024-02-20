@@ -58,16 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            CustomText(
-              text: UserPreferences.user.name,
-              color: colorScheme.onPrimary,
-              fontSize: 26,
-            ),
-          ],
-        ),
+        title: Container(
+            width: 80, height: 80, child: Image.asset('assets/logo.png')),
         automaticallyImplyLeading: false,
         actions: [
           IconButton.filled(onPressed: logout, icon: const Icon(Icons.logout))
@@ -78,28 +70,40 @@ class _MyHomePageState extends State<MyHomePage> {
           Center(child: Image.asset('assets/logo.png')),
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 20),
               child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(left: 10),
+                      margin: const EdgeInsets.only(left: 8),
                       alignment: Alignment.centerLeft,
                       child: CustomText(
                         color: colorScheme.primary,
-                        text: "Welcome to Vocal Aid ",
-                        fontSize: 30,
+                        text: "Welcome to",
+                        fontSize: 25,
+                        fontWeight: FontWeight.w300,
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 10),
+                      margin: const EdgeInsets.only(left: 8),
                       alignment: Alignment.centerLeft,
                       child: CustomText(
+                        color: colorScheme.primary,
+                        text: "Vocal Aid ",
+                        fontSize: 50,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 10),
+                      alignment: Alignment.centerLeft,
+                      child: const CustomText(
                           text:
                               "Empowering speech for the deaf, enhancing communication and expression."),
                     ),
                     SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 10, top: 10),
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
@@ -110,7 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     CustomCard(
-                      colorn: colorScheme.surface,
                       paddings: 0,
                       margins: 20,
                       child: InkWell(
@@ -153,7 +156,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       height: 20,
                     ),
                     CustomCard(
-                      colorn: colorScheme.surface,
                       paddings: 0,
                       margins: 5,
                       child: Column(
@@ -200,8 +202,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: Row(
                                   children: historyList.map((history) {
                                     return CustomCard(
-                                      margins: 0,
-                                      width: 200,
+                                      paddings: 5,
+                                      margins: 15,
+                                      width: 300,
                                       child: InkWell(
                                         onTap: () async {
                                           switchScreenWithData(
@@ -210,16 +213,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       .getVocalDetails(
                                                           history.word)));
                                         },
-                                        child: Column(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
                                           children: [
-                                            CustomText(
-                                              text: history.word,
-                                              color: colorScheme.tertiary,
-                                              fontSize: 30,
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                CustomText(
+                                                  text: history.word,
+                                                  color: colorScheme.tertiary,
+                                                  fontSize: 30,
+                                                ),
+                                                CustomText(
+                                                  text: "Percentage Accuracy",
+                                                  color: colorScheme.tertiary,
+                                                  fontSize: 13,
+                                                ),
+                                              ],
                                             ),
                                             AnimatedCircularProgressWidget(
                                               accuracy: history.accuracy,
-                                            ),
+                                              label: "",
+                                              size: 100,
+                                            )
                                           ],
                                         ),
                                       ),
@@ -232,7 +250,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         )
                       ],
                     ),
-                    Column(
+                    const Column(
                       children: [],
                     )
                   ],
@@ -242,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: const BottomNavBar(
         currentIndex: 0,
       ),
     );
@@ -251,28 +269,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
 Widget menuItem(String label, String screen) {
   return CustomCard(
-    width: 200,
+    width: 180,
     margins: 0,
-    height: 200,
+    paddings: 5,
+    height: 55,
+    elevation: 0,
+    border: true,
     child: InkWell(
       onTap: () {
         switchScreen(screen);
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          CustomText(
-            text: label,
-            fontSize: 25,
-            color: colorScheme.primary,
-          ),
-          SizedBox(
-            height: 10,
-          ),
           Image.asset(
             'assets/icons/$label.png',
-            width: 100,
-            height: 100,
+            color: colorScheme.primary,
+            width: 20,
+            height: 20,
+          ),
+          CustomText(
+            text: label,
+            fontSize: 18,
+            color: colorScheme.primary,
           ),
         ],
       ),

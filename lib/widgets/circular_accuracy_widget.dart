@@ -1,12 +1,19 @@
-import '../index.dart';
+import 'dart:math';
+import 'package:flutter/material.dart';
+// Assuming GoogleFonts and CustomText are correctly imported
 
 class AnimatedCircularProgressWidget extends StatefulWidget {
   final double accuracy;
+  final String? label;
+  final double? size;
 
   const AnimatedCircularProgressWidget({
-    super.key,
+    Key? key,
     required this.accuracy,
-  });
+    this.label,
+    this.size,
+  }) : super(key: key);
+
   @override
   _AnimatedCircularProgressWidgetState createState() =>
       _AnimatedCircularProgressWidgetState();
@@ -28,10 +35,12 @@ class _AnimatedCircularProgressWidgetState
 
     _accuracyAnimation = Tween<double>(
       begin: 0,
-      end: widget.accuracy, // Set the final accuracy value
-    ).animate(_animationController);
+      end: widget.accuracy,
+    ).animate(_animationController)
+      ..addListener(() {
+        setState(() {}); // This forces a rebuild whenever the animation changes
+      });
 
-    // Start the animation
     _animationController.forward();
   }
 
@@ -43,14 +52,10 @@ class _AnimatedCircularProgressWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _accuracyAnimation,
-      builder: (context, child) {
-        return CircularProgressWidget(
-          accuracy: _accuracyAnimation.value,
-          label: "Accuracy",
-        );
-      },
+    return CircularProgressWidget(
+      accuracy: _accuracyAnimation.value,
+      label: widget.label ?? "Accuracy",
+      size: widget.size,
     );
   }
 }
@@ -58,36 +63,51 @@ class _AnimatedCircularProgressWidgetState
 class CircularProgressWidget extends StatelessWidget {
   final double accuracy;
   final String label;
+  final double? size;
 
-  const CircularProgressWidget({required this.accuracy, required this.label});
+  const CircularProgressWidget({
+    required this.accuracy,
+    required this.label,
+    this.size,
+  });
 
   @override
   Widget build(BuildContext context) {
+    double effectiveSize =
+        size ?? 100.0; // Use the provided size or default to 100.0
+
     return Column(children: [
       Stack(children: [
         Container(
-          width: 100.0,
-          height: 100.0,
+          width: effectiveSize,
+          height: effectiveSize,
           child: CustomPaint(
             painter: ContinuousProgressPainter(accuracy: accuracy),
+            size: Size(effectiveSize, effectiveSize),
           ),
         ),
         Container(
-          width: 100.0,
-          height: 100.0,
-          child: Center(
-            child: Text(
-              "${accuracy.toInt()}",
-              style: GoogleFonts.lato(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+          width: effectiveSize,
+          height: effectiveSize,
+          alignment: Alignment.center, // Center the text within the container
+          child: Text(
+            "${accuracy.toInt()}%",
+            style: TextStyle(
+              fontSize: 0.2 *
+                  effectiveSize, // Dynamically adjust the font size based on the container size
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
         ),
       ]),
-      const CustomText(text: "Accuracy")
+      Visibility(
+        visible: label != "",
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Text(label),
+        ),
+      )
     ]);
   }
 }
@@ -99,32 +119,25 @@ class ContinuousProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
+    final paint = Paint()
       ..color = accuracy <= 30
           ? Colors.red
           : accuracy <= 60
               ? Colors.orange
               : Colors.green
       ..strokeCap = StrokeCap.round
-      ..strokeWidth = 10.0
+      ..strokeWidth = size.width /
+          15 // Adjust the stroke width based on the size of the widget
       ..style = PaintingStyle.stroke;
 
-    final Offset center = Offset(size.width / 2, size.height / 2);
-    final double radius = size.width / 2 - paint.strokeWidth / 2;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = min(size.width / 2, size.height / 2) - paint.strokeWidth / 2;
+    final arcAngle = 2 * pi * (accuracy / 100);
 
-    final double arcAngle = 2 * pi * (accuracy / 100);
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -pi / 2, // Start from the top
-      arcAngle,
-      false,
-      paint,
-    );
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2,
+        arcAngle, false, paint);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

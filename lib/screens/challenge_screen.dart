@@ -155,7 +155,7 @@ class _Challenge_screenState extends State<Challenge_screen> {
             ),
           ],
         ),
-        bottomNavigationBar: ButtomNavBar(
+        bottomNavigationBar: const BottomNavBar(
           currentIndex: 2,
         ));
   }
