@@ -25,7 +25,6 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
   double accuracy = 65;
   bool improvement = false;
   String modelOutput = "";
-  String groundTruth = "friensdjhvness";
   final progressStream = BehaviorSubject<WaveformProgress>();
   final progressStreamOriginal = BehaviorSubject<WaveformProgress>();
 
@@ -217,7 +216,7 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
   //   }
   // }
 
-  int points = 10;
+  double points = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -414,6 +413,7 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
                           // samples = newSamples;
                           // originalSamples = initOrigSamples;
                           accuracy = calculateAccuracy() * 100;
+                          points = calculateAccuracy() * 10;
                         });
                       }
 
@@ -602,6 +602,8 @@ class _SpeechEnhancementState extends State<SpeechEnhancement> {
 
     return correctCount / groundTruth.length;
   }
+
+  String groundTruth = "friensdvns";
 }
 
 /// Reads a WAV file, assuming it's encoded in a standard PCM format, and normalizes its audio samples.

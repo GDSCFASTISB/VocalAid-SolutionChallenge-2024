@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         navigatorKey: appNavigationKey,
+        debugShowCheckedModeBanner: false,
         home: UserPreferences.userSignedIn
             ? const MyHomePage()
             : const LoginPage(),
