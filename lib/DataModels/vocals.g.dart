@@ -9,9 +9,11 @@ part of 'vocals.dart';
 Vocals _$VocalsFromJson(Map<String, dynamic> json) => Vocals(
       words: json['words'] as String? ?? '',
       syllables: json['syllables'] as String? ?? '',
+      audioWaveUrl: json['audioWaveUrl'] as String? ?? '',
     );
 
 Map<String, dynamic> _$VocalsToJson(Vocals instance) => <String, dynamic>{
       'words': instance.words,
       'syllables': instance.syllables,
+      'audioWaveUrl': instance.audioWaveUrl,
     };

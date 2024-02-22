@@ -10,7 +10,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  int _counter = 0;
+  final int _counter = 0;
 
   void addUser() {
     DBHandler dbHandler = DBHandler.getDBHandler();
@@ -52,12 +52,7 @@ class _RegisterState extends State<Register> {
                       labelText: 'Password', border: OutlineInputBorder()),
                 )),
             ElevatedButton(
-                onPressed: () async {
-                  DBHandler db = DBHandler.getDBHandler();
-                  User user = await db.getUser("Salman");
-                  debugPrint(user.name);
-                },
-                child: const Text("Register")),
+                onPressed: () async {}, child: const Text("Register")),
             // const Text(
             //   'You have pushed the button this many times:',
             // ),
