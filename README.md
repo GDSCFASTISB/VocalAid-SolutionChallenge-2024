@@ -158,3 +158,13 @@ By pursuing these goals, VocalAid aims to become an even more powerful tool for 
   </tr>
 </table>
 
+## Footer
+<footer style="background-color: #f2f2f2; padding: 20px; text-align: center; border-top: 2px solid #ccc; margin-top: 20px;">
+    <div style="text-align: center;">
+        <h3>Our GDSC Chapter</h3>
+        <img src="images/244290903_601854337911096_6090204228442914296_n-removebg-preview.png" alt="GDSC Chapter Logo" style="width: 200px; height: auto; margin: 0 auto; display: block;">
+        <p>Join our GDSC Chapter to connect, learn, and grow. Follow us on <a href="https://www.instagram.com/gdscfastisb/">Social Media</a>.</p>
+    </div>
+</footer>
+
+
