@@ -13,7 +13,10 @@
     - [Training Roadmap](#training-roadmap)
 5. [User Guide](#user-guide)
 6. [Future Goals](#future-goals)
-   
+
+### Demo Video Link
+For a comprehensive demonstration of our VocalAid project in action, please watch the following video:
+[![Watch the video](images/VocalAID.png)](https://www.youtube.com/watch?v=Kjo8Bs92PT0)
 
 
 ## Project Overview
